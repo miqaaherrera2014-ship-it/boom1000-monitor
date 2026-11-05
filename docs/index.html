@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="color-scheme" content="dark"/>
+<title>Boom 1000 | Monitor IPDA</title>
+<style>
+:root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Arial;background:#0b101c;color:#f1f5ff;--edge:#28354a;--card:#141e2e;--cyan:#6ce6d2;--red:#ff7181;--soft:#9bacbf}*{box-sizing:border-box}body{margin:0}header{border-bottom:1px solid var(--edge);background:linear-gradient(110deg,#111b2b,#0c1423);padding:18px max(20px,calc((100vw - 1180px)/2))}h1{font-size:22px;margin:6px 0 5px;letter-spacing:-.5px}h2{font-size:17px;margin:0 0 12px}.eyebrow{font-size:11px;letter-spacing:1.3px;text-transform:uppercase;color:var(--cyan);font-weight:750}.muted{color:var(--soft)}p{line-height:1.5}main{max-width:1220px;margin:auto;padding:22px 18px 60px}.layout{display:grid;grid-template-columns:1.65fr 1fr;gap:16px}.panel{background:var(--card);border:1px solid var(--edge);border-radius:15px;padding:20px}.price{font-size:clamp(32px,5vw,56px);font-weight:740;letter-spacing:-1.7px;margin:6px 0}.meta{font-size:13px;color:var(--soft)}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0}.stat{background:#101a2a;border:1px solid var(--edge);padding:15px;border-radius:12px}.stat b{display:block;font-size:19px;margin-top:5px}.tiny{font-size:12px}.status{font-size:13px;display:inline-flex;align-items:center;gap:7px;background:#263344;border:1px solid #3a4c62;border-radius:30px;padding:7px 11px}.status:before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;background:#c7d3df}.status.ok:before{background:var(--cyan)}.status.bad:before{background:var(--red)}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}button,.button{border:1px solid #44617b;background:#233549;color:#eafbff;font-weight:650;border-radius:10px;padding:11px 14px;cursor:pointer;font-size:13px}button:hover{background:#304962}button.active{background:#24473f;color:#9df8e1;border-color:#408678}button:disabled{opacity:.4;cursor:default}.tablewrap{overflow:auto}table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;border-bottom:1px solid #263347;padding:11px 8px}th{font-size:11px;color:#a1b0c4;text-transform:uppercase;letter-spacing:.45px}tr:last-child td{border-bottom:none}.tag{padding:4px 8px;background:#24334a;border:1px solid #314b65;border-radius:6px;white-space:nowrap}.positive{color:var(--cyan)}.negative{color:var(--red)}.notice{padding:12px 14px;border-left:3px solid #d1ab5d;background:#29271f;border-radius:6px;font-size:13px;line-height:1.5;margin-top:15px}.tabs{display:flex;gap:5px}.tabs button{padding:7px 10px}.chart{width:100%;height:305px;display:block;border:1px solid #293348;border-radius:10px;background:#0d1726}.kv{display:flex;gap:15px;justify-content:space-between;margin:12px 0;font-size:13px;border-bottom:1px solid #273445;padding-bottom:10px}.kv span:last-child{text-align:right}.banner{border:1px dashed #476079;border-radius:12px;padding:12px;margin:0 0 16px;color:#c9d8e8;font-size:13px;line-height:1.5}.footer{font-size:12px;color:#8fa1b8;margin-top:18px;line-height:1.5}a{color:#90e8da}ul{padding-left:20px;line-height:1.8}#message{font-size:13px;line-height:1.45;color:#acc0d2;margin-top:12px;overflow-wrap:anywhere}@media(max-width:830px){.layout{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.chart{height:270px}.panel{padding:16px}}@media(max-width:430px){.stats{grid-template-columns:1fr 1fr}.stat b{font-size:15px}.price{font-size:36px}}
+</style>
+</head>
+<body>
+<header><div class="eyebrow">Datos directos de Deriv · Sin MetaTrader</div><h1>BOOM 1000 <span class="muted">/ monitor de compras swing</span></h1><div class="meta">1H · 4H · Diario · Solo lectura · Nunca ejecuta operaciones</div></header>
+<main>
+<div class="banner"><b>Transparencia:</b> el panel solo presenta cifras recibidas de Deriv con marca temporal. Si falla la conexión o los datos son antiguos, lo indica y no simula cotizaciones. La publicación automática requiere GitHub Actions activado en tu repositorio.</div>
+<div class="layout">
+<div>
+<section class="panel">
+<div style="display:flex;justify-content:space-between;gap:10px;align-items:start;flex-wrap:wrap"><div><div class="eyebrow">Cotización del instrumento exacto</div><div class="price" id="price">—</div><div class="meta" id="quote-time">Esperando datos verificables</div></div><div id="status" class="status bad">Sin conexión</div></div>
+<div class="stats">
+<div class="stat"><span class="muted tiny">Símbolo validado</span><b id="symbol">—</b></div>
+<div class="stat"><span class="muted tiny">Datos publicados</span><b id="snapshot-time">—</b></div>
+<div class="stat"><span class="muted tiny">Marco seleccionado</span><b id="selected-frame">4H</b></div>
+</div>
+<div class="actions"><button id="connect">Conectar en vivo</button><button id="refresh">Releer publicación</button><button id="export" disabled>Exportar JSON</button><button id="csv" disabled>Exportar CSV</button></div><div id="message">La conexión en vivo se intentará al abrir este panel.</div>
+</section>
+<section class="panel" style="margin-top:16px"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px"><h2 style="margin:0">Velas OHLC reales</h2><div class="tabs"><button data-frame="H1">1H</button><button data-frame="H4" class="active">4H</button><button data-frame="D1">Diario</button></div></div><svg id="chart" class="chart" viewBox="0 0 800 305" preserveAspectRatio="none" role="img" aria-label="Gráfico OHLC Deriv"></svg><p class="meta" id="candle-note">Las últimas velas pueden estar abiertas. Los cierres confirmados se distinguen por su horario UTC.</p></section>
+</div>
+<div>
+<section class="panel"><h2>Lectura objetiva</h2><div class="kv"><span class="muted">Sesgo de 4H</span><span id="bias">No verificable</span></div><div class="kv"><span class="muted">Rango reciente 4H</span><span id="swing-range">—</span></div><div class="kv"><span class="muted">Equilibrio 50 %</span><span id="eq">—</span></div><div class="kv"><span class="muted">Última vela 4H cerrada</span><span id="closed">—</span></div><div class="kv"><span class="muted">Situación frente al rango</span><span id="discount">—</span></div><div class="notice">Estas medidas son matemáticas. No afirman BOS, CDC, barridos institucionales ni Order Blocks sin una validación estructural aparte. <b>Señal operativa: ESPERAR.</b></div></section>
+<section class="panel" style="margin-top:16px"><h2>Zonas históricas para vigilar</h2><div class="tablewrap"><table><thead><tr><th>Zona</th><th>Estado</th></tr></thead><tbody id="zones"><tr><td colspan="2">Esperando precio auténtico</td></tr></tbody></table></div><p class="meta">No son órdenes ni POI confirmados; una zona alcanzada exige nueva validación en Diario/4H y CDC alcista en 1H/4H.</p></section>
+<section class="panel" style="margin-top:16px"><h2>Cómo usar los datos conmigo</h2><p class="tiny">Cuando el panel esté publicado en GitHub Pages, el archivo público <code>data/latest.json</code> contendrá el precio y las velas con fecha y hora. Pasame una sola vez esa dirección pública para incluirla en mis informes.</p><p class="tiny"><b>Solo compras swing:</b> riesgo orientativo ≤0,5 % del capital; sin ejecución automática.</p></section>
+</div>
+</div>
+<div class="footer">Datos: <a href="https://developers.deriv.com/docs/data/" target="_blank" rel="noopener">Deriv API oficial</a> · Horarios de velas UTC · Si la suscripción se desconecta, el monitor deja de afirmar que el precio es actual. El aviso de zonas solo funciona mientras esta página está abierta; los informes programados requieren una publicación accesible desde ChatGPT.</div>
+</main>
+<script>
+'use strict';
+const WS_ENDPOINTS=['wss://api.derivws.com/trading/v1/options/ws/public','wss://ws.derivws.com/websockets/v3?app_id=1089'];
+const PERIODS={H1:3600,H4:14400,D1:86400};
+const ZONES=[['15.480–15.550',15480,15550],['15.350–15.420',15350,15420],['14.653–14.786',14653,14786],['14.400–14.550',14400,14550],['14.216–14.417',14216,14417],['13.627',13620,13635],['13.019',13010,13030]];
+let data=null;let ws=null;let activeEndpoint=0;let frame='H4';let latestConnection=false;let reconnectTimer=null;let activeSymbol='';let connected=false;
+const $=id=>document.getElementById(id);
+const n=(x,d=2)=>Number(x).toLocaleString('es-AR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const when=epoch=>new Date(epoch*1000).toLocaleString('es-AR',{timeZone:'America/Argentina/Buenos_Aires',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'} )+' (ARG)';
+function status(text,good){$('status').textContent=text;$('status').className='status '+(good?'ok':'bad');}
+function msg(s){$('message').textContent=s;}
+function clean(items){return (items||[]).map(c=>({epoch:+c.epoch,open:+c.open,high:+c.high,low:+c.low,close:+c.close})).filter(c=>[c.epoch,c.open,c.high,c.low,c.close].every(Number.isFinite)&&c.low<=Math.min(c.open,c.close)&&c.high>=Math.max(c.open,c.close)).sort((a,b)=>a.epoch-b.epoch);}
+function snapshotFresh(){return data&&Number.isFinite(+data.generated_epoch)&&Math.abs(Date.now()/1000-data.generated_epoch)<40*60;}
+function tickFresh(){return data&&data.last_tick&&Number.isFinite(+data.last_tick.epoch)&&Math.abs(Date.now()/1000-data.last_tick.epoch)<180;}
+function isValidSnap(s){return s&&s.instrument==='Boom 1000 Index'&&typeof s.symbol==='string'&&s.symbol.length>1&&s.candles&&['H1','H4','D1'].every(p=>Array.isArray(s.candles[p])&&s.candles[p].length>0);}
+function setData(obj,mode){if(!isValidSnap(obj)){msg('El servidor devolvió un formato incompleto. No se publica como datos verificables.');return;}
+ const cleaned={...obj,candles:{H1:clean(obj.candles.H1),H4:clean(obj.candles.H4),D1:clean(obj.candles.D1)}};
+ if(!['H1','H4','D1'].every(p=>cleaned.candles[p].length>3)){msg('Faltan velas válidas.');return;}
+ data=cleaned;activeSymbol=data.symbol;$('symbol').textContent=data.symbol;
+ $('snapshot-time').textContent=data.generated_epoch?when(data.generated_epoch):'Sin fecha';
+ $('export').disabled=false;$('csv').disabled=false;render();
+ if(mode==='published')msg('Snapshot público cargado. Se intentará la conexión directa en vivo.');}
+function render(){if(!data)return;
+ $('selected-frame').textContent=frame==='H4'?'4H':frame==='D1'?'Diario':'1H';
+ if(tickFresh()){$('price').textContent=n(data.last_tick.price,4);$('quote-time').textContent='Tick Deriv · '+when(data.last_tick.epoch);status(latestConnection?'EN VIVO':'Último tick reciente',true);}
+ else {$('price').textContent=data.last_tick?n(data.last_tick.price,4):'—';$('quote-time').textContent=data.last_tick?'ÚLTIMO TICK ANTIGUO: '+when(data.last_tick.epoch):'No hay tick verificable';status('SIN PRECIO ACTUAL',false);}
+ drawChart();drawZones();drawStructure();}
+function drawStructure(){const bars=data.candles.H4;const now=Date.now()/1000;const closed=bars.filter(c=>c.epoch+14400<now-8);const arr=closed.slice(-32);if(arr.length<12)return;
+ const last=arr.at(-1), first=arr[0], highs=arr.map(x=>x.high),lows=arr.map(x=>x.low), hi=Math.max(...highs),lo=Math.min(...lows),mid=(hi+lo)/2;
+ const higher=last.close>first.close;
+ $('bias').textContent=higher?'Últimas 32 velas: balance positivo':'Últimas 32 velas: balance negativo';
+ $('swing-range').textContent=n(lo)+' – '+n(hi);$('eq').textContent=n(mid);$('closed').textContent=n(last.close)+' · '+when(last.epoch+14400);
+ $('discount').textContent=last.close<=mid?'Discount (debajo de 50 %)':'Premium (encima de 50 %)';}
+function drawZones(){const price=tickFresh()?Number(data.last_tick.price):null;$('zones').innerHTML=ZONES.map(([name,lo,hi])=>{let label='Referencia histórica',cls='muted';if(price!==null&&price>=lo&&price<=hi){label='Precio dentro · revisar velas';cls='positive';}else if(price!==null&&price>hi){label='Precio por encima';}else if(price!==null){label='Precio por debajo';}return `<tr><td>${name}</td><td class="${cls}">${label}</td></tr>`}).join('');}
+function drawChart(){const list=data.candles[frame].slice(-90),svg=$('chart');if(list.length<5)return;
+ const w=800,h=305,L=22,R=80,T=14,B=28,scaleW=w-L-R,scaleH=h-T-B;
+ const lo=Math.min(...list.map(c=>c.low)),hi=Math.max(...list.map(c=>c.high)),range=Math.max(0.00001,hi-lo),pad=range*.075;
+ const min=lo-pad,max=hi+pad,yy=p=>T+(max-p)/(max-min)*scaleH,step=scaleW/list.length,cw=Math.max(2,step*.64),pr=[];
+ for(let i=0;i<=5;i++){const price=max-i*(max-min)/5,y=yy(price);pr.push(`<line x1="${L}" y1="${y}" x2="${w-R}" y2="${y}" stroke="#2c3850" opacity=".8"/><text x="${w-R+7}" y="${y+4}" fill="#aebccd" font-size="10">${n(price,0)}</text>`)}
+ list.forEach((c,i)=>{const x=L+(i+.5)*step,color=c.close>=c.open?'#5bdfc5':'#fa7187';pr.push(`<line x1="${x}" y1="${yy(c.high)}" x2="${x}" y2="${yy(c.low)}" stroke="${color}" stroke-width="1.2"/><rect x="${x-cw/2}" y="${Math.min(yy(c.open),yy(c.close))}" width="${cw}" height="${Math.max(1.3,Math.abs(yy(c.open)-yy(c.close)))}" fill="${color}" />`)});
+ [0,.25,.5,.75,1].forEach(fr=>{const idx=Math.min(list.length-1,Math.floor(fr*(list.length-1))),item=list[idx],x=L+(idx+.5)*step;pr.push(`<text x="${x}" y="${h-7}" fill="#9bb0c4" text-anchor="middle" font-size="10">${new Date(item.epoch*1000).toLocaleDateString('es-AR',{timeZone:'UTC',day:'2-digit',month:'2-digit'})}</text>`)});
+ svg.innerHTML=pr.join('');$('candle-note').textContent=`Velas ${frame} · ${list.length} barras visibles · Última barra podría estar abierta · Deriv API · UTC`;}
+async function loadPublished(){try{const r=await fetch('data/latest.json?nonce='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);const s=await r.json();setData(s,'published');}catch(e){msg('Sin publicación automática todavía: '+e.message+'. Si el sitio está abierto como archivo local, probá la conexión en vivo o publicalo en GitHub Pages.');}}
+function send(req){if(ws&&ws.readyState===WebSocket.OPEN)ws.send(JSON.stringify(req));}
+function findSymbol(list){for(const item of list||[]){const name=(item.underlying_symbol_name||item.display_name||'').trim().replace(/\s+/g,' ');if(/^Boom 1000 Index$/i.test(name)){return {symbol:item.underlying_symbol||item.symbol,name};}}return null;}
+function beginWs(index=0){clearTimeout(reconnectTimer);latestConnection=false;if(ws)try{ws.close();}catch{};activeEndpoint=index;connected=false;
+ if(index>=WS_ENDPOINTS.length){status('API NO DISPONIBLE',false);msg('Fallaron las dos conexiones directas. Si GitHub Actions logra conectarse, el panel leerá la publicación automática.');return;}
+ status('CONECTANDO…',false);msg('Intentando el WebSocket público oficial '+(index===0?'actual':'alternativo')+'…');
+ try{const sock=new WebSocket(WS_ENDPOINTS[index]);ws=sock;
+ const fail=setTimeout(()=>{if(!connected){try{sock.close();}catch{}}},16000);
+ sock.onopen=()=>{connected=true;clearTimeout(fail);send({active_symbols:'brief',req_id:100});msg('Conexión establecida. Verificando nombre exacto de Boom 1000 Index…');};
+ sock.onmessage=(ev)=>{let m;try{m=JSON.parse(ev.data);}catch{return;}
+ if(m.error){msg('Deriv: '+(m.error.message||m.error.code));if(m.req_id===100||m.req_id>=200&&m.req_id<300){sock.close();}return;}
+ if(m.msg_type==='active_symbols'&&m.req_id===100){const found=findSymbol(m.active_symbols);if(!found){msg('No figura Boom 1000 Index exacto en la lista oficial. No uso otro índice.');sock.close();return;}activeSymbol=found.symbol;$('symbol').textContent=found.symbol;send({ticks:found.symbol,subscribe:1,req_id:300});Object.entries(PERIODS).forEach(([k,gran],i)=>send({ticks_history:found.symbol,end:'latest',count:140,style:'candles',granularity:gran,req_id:200+i}));}
+ if(m.msg_type==='tick'&&m.tick&&m.tick.quote!==undefined&&m.tick.epoch){if(!data)data={schema_version:1,instrument:'Boom 1000 Index',symbol:activeSymbol,source:'Deriv API / streaming',generated_at:new Date().toISOString(),generated_epoch:Math.floor(Date.now()/1000),candles:{H1:[],H4:[],D1:[]},last_tick:null};
+ data.last_tick={price:+m.tick.quote,epoch:+m.tick.epoch};data.generated_epoch=Math.floor(Date.now()/1000);latestConnection=true;$('symbol').textContent=activeSymbol;$('snapshot-time').textContent=when(data.generated_epoch);if(['H1','H4','D1'].every(k=>data.candles[k].length>3)){ $('export').disabled=false;$('csv').disabled=false;render(); }else {$('price').textContent=n(data.last_tick.price,4);$('quote-time').textContent='Tick Deriv · '+when(data.last_tick.epoch);status(tickFresh()?'EN VIVO':'TICK DESACTUALIZADO',tickFresh());}}
+ if(m.msg_type==='candles'&&Array.isArray(m.candles)&&m.req_id>=200&&m.req_id<=202){if(!data)data={schema_version:1,instrument:'Boom 1000 Index',symbol:activeSymbol,source:'Deriv API / streaming',generated_at:new Date().toISOString(),generated_epoch:Math.floor(Date.now()/1000),candles:{H1:[],H4:[],D1:[]},last_tick:null};const name=['H1','H4','D1'][m.req_id-200];data.candles[name]=clean(m.candles);if(['H1','H4','D1'].every(k=>data.candles[k].length>3)){latestConnection=true;$('export').disabled=false;$('csv').disabled=false;render();msg('Velas directas cargadas de Deriv. Datos en vivo mientras el navegador permanece abierto.');}}
+ };
+ sock.onerror=()=>{msg('Conexión rechazada o bloqueada por red/origen.');};
+ sock.onclose=()=>{clearTimeout(fail);latestConnection=false;if(index===0){beginWs(1);}else{status('SIN CONEXIÓN DIRECTA',false);msg('No se logró conexión directa. El archivo público sigue disponible si el recolector de GitHub Actions está funcionando.');}if(data)render();};
+ }catch(e){msg(e.message);beginWs(index+1);}}
+function saveFile(name,content,type){const b=new Blob([content],{type}),url=URL.createObjectURL(b),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+$('export').onclick=()=>{if(data)saveFile('boom1000-snapshot.json',JSON.stringify(data,null,2),'application/json');};
+$('csv').onclick=()=>{if(!data)return;const rows=['marco,utc,open,high,low,close'];Object.entries(data.candles).forEach(([f,cs])=>cs.forEach(c=>rows.push(`${f},${new Date(c.epoch*1000).toISOString()},${c.open},${c.high},${c.low},${c.close}`)));saveFile('boom1000-velas.csv',rows.join('\n'),'text/csv');};
+$('connect').onclick=()=>beginWs(0);$('refresh').onclick=loadPublished;
+document.querySelectorAll('[data-frame]').forEach(b=>b.addEventListener('click',()=>{frame=b.dataset.frame;document.querySelectorAll('[data-frame]').forEach(x=>x.classList.toggle('active',x.dataset.frame===frame));if(data&&data.candles[frame].length>3)render();}));
+loadPublished();beginWs(0);setInterval(()=>{if(data)render();},15000);setInterval(loadPublished,180000);
+</script>
+</body></html>
